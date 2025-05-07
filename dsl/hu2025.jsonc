@@ -1,0 +1,112 @@
+{
+  /* =============================================================
+     METAADATOK
+     =============================================================
+     Az állomány a 2025-ös magyar bérszabályokat írja le.
+     A kommentek magyarul segítenek azonnal látni, mi-micsoda.
+  */
+  "meta": {
+    "country": "HU",
+    "year": 2025,
+    "description": "2025. január 1-től érvényes jogszabályok (25 év alatti, 30 év alatti anyák, családi kedvezmény, munkaerő-piacra lépő SZOCHO-kedvezmény)"
+  },
+  /* =============================================================
+     KONSTANSOK (változók)
+     -------------------------------------------------------------
+     Ezek azonosítók a későbbi képletekben: nagybetűs nevek ⇢ számok
+  */
+  "variables": {
+    /* Minimálbér és garantált bérminimum – 639/2024. (XI.22.) Korm. rendelet */
+    "MIN_WAGE": 290800, // havi minimálbér (Ft)
+    "GUAR_MIN_WAGE": 348800, // havi garantált bérminimum (Ft)
+    /* 25 év alattiak / 30 év alatti anyák SZJA-mentes összeghatára
+       = 2024. júliusi bruttó átlagkereset (KSH) */
+    "UNDER25_CAP": 656785,
+    /* Adó- és járulékkulcsok (%) */
+    "SZJA_RATE": 0.15, // személyi jövedelemadó
+    "SSC_RATE": 0.185, // TB járulék a munkavállalótól
+    "SZOCHO_RATE": 0.13, // szociális hozzájárulási adó (munkáltató)
+    "SZOCHO_HALF": 0.065, // 50 %-os kedvezményes SZOCHO-kulcs
+    /* Havi családi kedvezmény (adóalap-csökkentés) – Szja tv. 29/A. § */
+    "FAM_ONE": 66670, // 1 eltartott
+    "FAM_TWO": 133330, // 2 eltartott
+    "FAM_THREE": 220000 // 3 vagy több eltartott
+  },
+  /* =============================================================
+     SZABÁLYOK
+     -------------------------------------------------------------
+     Mindegyik elem:
+       id        – egyedi név
+       type      – "percentage" (%-os tétel) vagy "credit" (összeg)
+       direction – employee / employer (csak percentage-nél kell)
+       rate/base/amount/condition – képletek (DSL)
+  */
+  "rules": [
+    /* ---------- 1) MUNKAVÁLLALÓI LEVONÁSOK ---------- */
+    {
+      "id": "tb_jarulek",
+      "label": "TB-járulék 18,5 %",
+      "type": "percentage",
+      "direction": "employee",
+      "rate": "SSC_RATE",
+      "base": "gross"
+    },
+    {
+      "id": "szja_full",
+      "label": "SZJA 15 %",
+      "type": "percentage",
+      "direction": "employee",
+      "rate": "SZJA_RATE",
+      "base": "gross"
+    },
+    {
+      "id": "under25_credit",
+      "label": "25 év alatti SZJA-jóváírás",
+      "type": "credit",
+      "direction": "employee",
+      "amount": "min(gross, UNDER25_CAP) * SZJA_RATE",
+      "condition": "flags.under25 and not flags.mother_under30"
+    },
+    {
+      "id": "mother_u30_credit",
+      "label": "30 év alatti anyák SZJA-jóváírás",
+      "type": "credit",
+      "direction": "employee",
+      "amount": "min(gross, UNDER25_CAP) * SZJA_RATE",
+      "condition": "flags.mother_under30"
+    },
+    {
+      "id": "family_allowance_credit",
+      "label": "Családi adókedvezmény",
+      "type": "credit",
+      "direction": "employee",
+      "amount": "((flags.children==1)*FAM_ONE + (flags.children==2)*FAM_TWO + (flags.children>=3)*FAM_THREE) * SZJA_RATE",
+      "condition": "flags.children >= 1"
+    },
+    /* ---------- 2) MUNKÁLTATÓI TÉTELEK ---------- */
+    {
+      "id": "szocho_full",
+      "label": "SZOCHO 13 %",
+      "type": "percentage",
+      "direction": "employer",
+      "rate": "SZOCHO_RATE",
+      "base": "gross"
+    },
+    {
+      "id": "entrant_full_credit",
+      "label": "SZOCHO-kedvezmény 0 % (minimálbérig, 1-12. hó)",
+      "type": "credit",
+      "direction": "employer",
+      "amount": "-min(gross, MIN_WAGE) * SZOCHO_RATE",
+      "condition": "flags.entrant and flags.months_on_job < 12"
+    },
+    {
+      "id": "entrant_half_credit",
+      "label": "SZOCHO-kedvezmény 6,5 % (minimálbérig, 13-18. hó)",
+      "type": "credit",
+      "direction": "employer",
+      "amount": "-min(gross, MIN_WAGE) * SZOCHO_HALF",
+      "condition": "flags.entrant and flags.months_on_job >= 12 and flags.months_on_job < 18"
+    }
+  ]
+}
