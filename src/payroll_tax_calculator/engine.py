@@ -42,11 +42,32 @@ class PayrollEngine:
 
         net = gross + employee_total
         cost = gross + employer_total
+        
+        # Sort breakdown values: employee items first, then employer items
+        # Within each group, sort by absolute amount value in descending order
+        sorted_breakdown = {}
+        
+        # First, get all items and sort them
+        breakdown_items = list(breakdown.items())
+        
+        # Sort by direction (employee first) and then by absolute amount in descending order
+        sorted_items = sorted(
+            breakdown_items,
+            key=lambda x: (
+                0 if x[1]["direction"] == "employee" else 1,  # Employee first (0), then employer (1)
+                -abs(x[1]["amount"])  # Sort by absolute amount in descending order
+            )
+        )
+        
+        # Rebuild the dictionary with the sorted items
+        for key, value in sorted_items:
+            sorted_breakdown[key] = value
+            
         return {
             "gross": gross,
             "net": net,
             "super_gross": cost,
-            "breakdown": breakdown,
+            "breakdown": sorted_breakdown,
         }
 
     def get_flags(self) -> List[str]:
