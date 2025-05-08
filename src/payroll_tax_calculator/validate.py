@@ -18,28 +18,27 @@ import sys
 from pathlib import Path
 
 import jsonschema
-
 from loader import _strip_json_comments
 
 
 def validate_dsl_file(file_path: Path, schema_path: Path) -> bool:
     """
     Validate a DSL JSONC file against the schema.
-    
+
     Args:
         file_path: Path to the DSL JSONC file
         schema_path: Path to the schema file
-        
+
     Returns:
         True if validation succeeds, False otherwise
     """
     try:
         # Load and parse the schema
-        with open(schema_path, 'r', encoding='utf-8') as f:
+        with open(schema_path, "r", encoding="utf-8") as f:
             schema = json.load(f)
 
         # Load and parse the DSL file (stripping comments)
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             dsl_content = f.read()
 
         # Strip comments from JSONC
@@ -71,16 +70,14 @@ def validate_dsl_file(file_path: Path, schema_path: Path) -> bool:
 
 def main() -> int:
     """Run the validation script."""
-    parser = argparse.ArgumentParser(description="Validate DSL JSONC files against the schema")
-    parser.add_argument(
-        "--schema",
-        default="dsl/schema.json",
-        help="Path to the schema file"
+    parser = argparse.ArgumentParser(
+        description="Validate DSL JSONC files against the schema"
     )
     parser.add_argument(
-        "paths",
-        nargs="+",
-        help="One or more DSL JSONC files to validate"
+        "--schema", default="dsl/schema.json", help="Path to the schema file"
+    )
+    parser.add_argument(
+        "paths", nargs="+", help="One or more DSL JSONC files to validate"
     )
 
     args = parser.parse_args()
@@ -106,7 +103,7 @@ def main() -> int:
             success = False
 
     return 0 if success else 1
-                                                                                                                                                                                          
-                                                                                                                                                                                          
+
+
 if __name__ == "__main__":
     sys.exit(main())
