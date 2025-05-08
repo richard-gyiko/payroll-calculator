@@ -14,13 +14,16 @@ app = FastAPI(
 )
 
 
-class PayrollRequest(BaseModel):
-    """Request model for payroll calculation."""
-
+class PayrollRequestModel(BaseModel):
     country: str = Field(..., description="Country code (e.g., 'hu' for Hungary)")
     date: datetime.date = Field(
         ..., description="Date of the payroll calculation (YYYY-MM-DD)"
     )
+
+
+class PayrollRequest(PayrollRequestModel):
+    """Request model for payroll calculation."""
+
     gross: int = Field(..., description="Gross salary")
     flags: Dict[str, Any] = Field(
         default_factory=dict, description="Dynamic flags for calculation"
@@ -56,13 +59,37 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
             detail=f"Configuration file for year {request.date.year} and country {request.country} not found",
         )
 
-    # Start with the provided flags and add the date
-    flags = request.flags.copy()
-    flags["date"] = request.date.strftime("%Y-%m-%d")
-
     try:
         compiled, _, _ = load_rules(json_path)
         engine = PayrollEngine(compiled)
+
+        # Get required flags from the engine
+        required_flags = engine.get_flags()
+
+        # Start with the provided flags and add the date
+        flags = request.flags.copy()
+        flags["date"] = request.date.strftime("%Y-%m-%d")
+
+        # Validate flags
+        missing_flags = [
+            flag for flag in required_flags if flag not in flags and flag != "date"
+        ]
+        if missing_flags:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required flags: {', '.join(missing_flags)}",
+            )
+
+        # Check for unsupported flags
+        unsupported_flags = [
+            flag for flag in flags if flag != "date" and flag not in required_flags
+        ]
+        if unsupported_flags:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported flags: {', '.join(unsupported_flags)}",
+            )
+
         result = engine.run(request.gross, **flags)
 
         return PayrollResponse(
@@ -77,18 +104,9 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
         raise HTTPException(status_code=500, detail=f"Calculation error: {str(e)}")
 
 
-class PayrollFlagsRequest(BaseModel):
-    """Request model for payroll flags."""
-
-    country: str = Field(..., description="Country code (e.g., 'hu' for Hungary)")
-    date: datetime.date = Field(
-        ..., description="Date of the payroll calculation (YYYY-MM-DD)"
-    )
-
-
 @app.get("/flags", operation_id="get_payroll_flags")
-def get_flags(request: Annotated[PayrollFlagsRequest, Query()]) -> Dict[str, Any]:
-    """Get available flags for the given year."""
+def get_flags(request: Annotated[PayrollRequestModel, Query()]) -> Dict[str, Any]:
+    """Get available flags for the given calculation."""
     if request.date.year not in (2024, 2025):
         raise HTTPException(
             status_code=400,

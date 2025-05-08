@@ -74,4 +74,20 @@ class PayrollEngine:
                         if flag_name:
                             flags.add(flag_name)
 
+            # Also check amount functions for flag usage
+            if hasattr(rule.amount_fn, "__doc__") and rule.amount_fn.__doc__:
+                amount_expr = rule.amount_fn.__doc__
+                if "flags." in amount_expr:
+                    # Extract flag names from expressions like flags.under25, flags.children, etc.
+                    for part in amount_expr.split("flags.")[1:]:
+                        # Extract the flag name (stops at space, operator, etc.)
+                        flag_name = ""
+                        for char in part:
+                            if char.isalnum() or char == "_":
+                                flag_name += char
+                            else:
+                                break
+                        if flag_name:
+                            flags.add(flag_name)
+
         return sorted(list(flags))
