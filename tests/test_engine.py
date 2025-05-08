@@ -55,20 +55,6 @@ class TestPayrollEngine(unittest.TestCase):
         mock_load_rules.assert_called_once_with("dummy/path.yaml")
         self.assertEqual(engine.rules, mock_rules)
 
-    @patch("src.payroll_tax_calculator.engine.load_rules")
-    def test_from_json_legacy(self, mock_load_rules):
-        """Test PayrollEngine.from_json legacy method."""
-        # Setup mock
-        mock_rules = [MagicMock(spec=CompiledRule)]
-        mock_load_rules.return_value = (mock_rules, {}, {})
-
-        # Call method
-        engine = PayrollEngine.from_json("dummy/path.yaml")
-
-        # Assertions
-        mock_load_rules.assert_called_once_with("dummy/path.yaml")
-        self.assertEqual(engine.rules, mock_rules)
-
     def test_run_with_rules(self):
         """Test PayrollEngine.run with multiple rules."""
         # Run the engine with a gross salary and some flags

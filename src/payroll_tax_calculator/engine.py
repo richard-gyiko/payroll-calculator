@@ -20,11 +20,6 @@ class PayrollEngine:
         compiled, *_ = load_rules(config_path)
         return cls(compiled)
 
-    @classmethod
-    def from_json(cls, config_path: str | Path):
-        """Legacy method kept for backward compatibility. Use from_yaml instead."""
-        return cls.from_yaml(config_path)
-
     def run(self, gross: int | float, **flags) -> Dict[str, Any]:
         ctx: Dict[str, Any] = {"gross": gross, "flags": flags}
         breakdown: Dict[str, float] = {}
