@@ -1,11 +1,11 @@
 """
-Validate DSL JSONC files against the schema.
+Validate DSL files (YAML) against the schema.
 
 Usage:
     validate-dsl [--schema SCHEMA] PATH...
 
 Arguments:
-    PATH        One or more DSL JSONC files to validate
+    PATH        One or more DSL files (YAML) to validate
 
 Options:
     --schema SCHEMA   Path to the schema file [default: dsl/schema.json]
@@ -18,16 +18,15 @@ import sys
 from pathlib import Path
 
 import jsonschema
-
-from .loader import _strip_json_comments
+from ruamel.yaml import YAML
 
 
 def validate_dsl_file(file_path: Path, schema_path: Path) -> bool:
     """
-    Validate a DSL JSONC file against the schema.
+    Validate a DSL file (YAML) against the schema.
 
     Args:
-        file_path: Path to the DSL JSONC file
+        file_path: Path to the DSL file (YAML)
         schema_path: Path to the schema file
 
     Returns:
@@ -38,15 +37,18 @@ def validate_dsl_file(file_path: Path, schema_path: Path) -> bool:
         with open(schema_path, "r", encoding="utf-8") as f:
             schema = json.load(f)
 
-        # Load and parse the DSL file (stripping comments)
+        # Ensure file has YAML extension
+        if file_path.suffix.lower() not in (".yaml", ".yml"):
+            print(
+                f"❌ {file_path} - Unsupported file format. Only YAML (.yaml, .yml) files are supported.",
+                file=sys.stderr,
+            )
+            return False
+
+        # Load YAML file
+        yaml = YAML(typ="safe")
         with open(file_path, "r", encoding="utf-8") as f:
-            dsl_content = f.read()
-
-        # Strip comments from JSONC
-        json_content = _strip_json_comments(dsl_content)
-
-        # Parse the JSON
-        dsl_data = json.loads(json_content)
+            dsl_data = yaml.load(f)
 
         # Validate against schema
         jsonschema.validate(instance=dsl_data, schema=schema)
@@ -72,13 +74,13 @@ def validate_dsl_file(file_path: Path, schema_path: Path) -> bool:
 def main() -> int:
     """Run the validation script."""
     parser = argparse.ArgumentParser(
-        description="Validate DSL JSONC files against the schema"
+        description="Validate DSL YAML files against the schema"
     )
     parser.add_argument(
         "--schema", default="dsl/schema.json", help="Path to the schema file"
     )
     parser.add_argument(
-        "paths", nargs="+", help="One or more DSL JSONC files to validate"
+        "paths", nargs="+", help="One or more DSL YAML files to validate"
     )
 
     args = parser.parse_args()
@@ -92,9 +94,12 @@ def main() -> int:
     for path_str in args.paths:
         path = Path(path_str)
         if path.is_dir():
-            # If directory, find all .jsonc files
-            for jsonc_file in path.glob("**/*.jsonc"):
-                if not validate_dsl_file(jsonc_file, schema_path):
+            # If directory, find all .yaml/.yml files
+            for dsl_file in path.glob("**/*.yaml"):
+                if not validate_dsl_file(dsl_file, schema_path):
+                    success = False
+            for dsl_file in path.glob("**/*.yml"):
+                if not validate_dsl_file(dsl_file, schema_path):
                     success = False
         elif path.exists():
             if not validate_dsl_file(path, schema_path):

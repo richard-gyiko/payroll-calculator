@@ -12,7 +12,7 @@ class TestIntegration:
     def test_end_to_end_calculation(self, test_dsl_path):
         """Test the end-to-end calculation process using a test DSL file."""
         # Load rules from the test DSL file
-        engine = PayrollEngine.from_json(test_dsl_path)
+        engine = PayrollEngine.from_yaml(test_dsl_path)
 
         # Run the engine with a gross salary
         result = engine.run(1000)
@@ -40,7 +40,7 @@ class TestIntegration:
 
     def test_end_to_end_with_flags(self, test_dsl_path):
         """Test the end-to-end calculation with flags."""
-        engine = PayrollEngine.from_json(test_dsl_path)
+        engine = PayrollEngine.from_yaml(test_dsl_path)
 
         # Run with a high gross salary (above the tax credit threshold)
         result = engine.run(3000)
@@ -54,7 +54,7 @@ class TestIntegration:
 
     def test_get_flags_from_dsl(self, test_dsl_path):
         """Test extracting flags from the DSL file."""
-        engine = PayrollEngine.from_json(test_dsl_path)
+        engine = PayrollEngine.from_yaml(test_dsl_path)
 
         # The test DSL doesn't have any flags in the conditions,
         # so we'll modify one of the rules to use flags
@@ -89,7 +89,7 @@ class TestIntegration:
 
     def test_rule_conditions(self, test_dsl_path):
         """Test that rule conditions are properly evaluated."""
-        engine = PayrollEngine.from_json(test_dsl_path)
+        engine = PayrollEngine.from_yaml(test_dsl_path)
 
         # Run with different gross values to test the tax_credit condition
         result1 = engine.run(1000)  # Below threshold, should get credit

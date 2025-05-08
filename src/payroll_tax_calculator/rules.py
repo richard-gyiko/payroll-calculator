@@ -5,10 +5,6 @@ from typing import Any, Callable, Dict, List, Protocol
 
 from .safe_eval import compile_safe_expr
 
-# ---------------------------------------------------------------------------
-# Core dataclass used at run-time by the engine
-# ---------------------------------------------------------------------------
-
 
 @dataclass(frozen=True)
 class CompiledRule:

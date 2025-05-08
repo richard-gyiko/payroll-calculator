@@ -1,6 +1,3 @@
-# engine.py
-"""Execution engine + CLI wrapper for the JSON‑defined payroll rules."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -19,7 +16,7 @@ class PayrollEngine:
         self.rules = rules
 
     @classmethod
-    def from_json(cls, config_path: str | Path):
+    def from_yaml(cls, config_path: str | Path):
         compiled, *_ = load_rules(config_path)
         return cls(compiled)
 

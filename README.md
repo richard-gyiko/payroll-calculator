@@ -7,7 +7,7 @@ A flexible, rule-based calculator for employee taxes that determines net salary 
 
 ## Overview
 
-This application provides a REST API and MCP Server for calculating employment-related taxes and contributions using a flexible rule-based system defined in JSONC files. While it comes with Hungarian tax rules for 2024 and 2025, the engine is country-agnostic and can be extended with any valid DSL configuration.
+This application provides a REST API and MCP Server for calculating employment-related taxes and contributions using a flexible rule-based system defined in YAML files. While it comes with Hungarian tax rules for 2024 and 2025, the engine is country-agnostic and can be extended with any valid DSL configuration.
 
 ## Features
 
