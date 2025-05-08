@@ -1,9 +1,9 @@
 import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Annotated, Any, Dict
 
 from engine import PayrollEngine
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi_mcp import FastApiMCP
 from loader import load_rules
 from pydantic import BaseModel, Field
@@ -82,6 +82,44 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Calculation error: {str(e)}")
+
+
+class PayrollFlagsRequest(BaseModel):
+    """Request model for payroll flags."""
+
+    country: str = Field(..., description="Country code (e.g., 'hu' for Hungary)")
+    date: datetime.date = Field(
+        ..., description="Date of the payroll calculation (YYYY-MM-DD)"
+    )
+
+
+@app.get("/flags", operation_id="get_payroll_flags")
+def get_flags(request: Annotated[PayrollFlagsRequest, Query()]) -> Dict[str, Any]:
+    """Get available flags for the given year."""
+    if request.date.year not in (2024, 2025):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Year must be either 2024 or 2025, got {request.date.year}",
+        )
+
+    json_path = Path(f"dsl/{request.country}{request.date.year}/dsl.jsonc")
+    if not json_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"Configuration file for year {request.date.year} and country {request.country} not found",
+        )
+
+    try:
+        compiled, _, _ = load_rules(json_path)
+        engine = PayrollEngine(compiled)
+        flags = engine.get_flags()
+
+        # Exclude 'date' from the flags as it's provided in the request
+        flags = [flag for flag in flags if flag != "date"]
+
+        return {"flags": flags}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving flags: {str(e)}")
 
 
 mcp = FastApiMCP(app, include_operations=["calculate_payroll"])

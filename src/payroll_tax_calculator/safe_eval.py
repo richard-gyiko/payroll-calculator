@@ -146,5 +146,7 @@ def compile_safe_expr(
         }
         return eval(code, {"__builtins__": {}}, {**_ALLOWED_FUNCTIONS, **env})
 
-    _fn.__doc__ = expr  # handy for debugging
+    # Store the original expression in the function's docstring
+    # This will be used by get_flags() to extract flag names
+    _fn.__doc__ = expr
     return _fn
