@@ -56,38 +56,29 @@ class PayrollEngine:
         """Extract and return all flag names used in rule conditions."""
         flags = set()
 
-        # Examine each rule's condition function's docstring
-        # The docstring contains the original expression
         for rule in self.rules:
+            # Extract flags from condition function's docstring
             if hasattr(rule.condition_fn, "__doc__") and rule.condition_fn.__doc__:
-                condition_expr = rule.condition_fn.__doc__
-                if "flags." in condition_expr:
-                    # Extract flag names from expressions like flags.under25, flags.children, etc.
-                    for part in condition_expr.split("flags.")[1:]:
-                        # Extract the flag name (stops at space, operator, etc.)
-                        flag_name = ""
-                        for char in part:
-                            if char.isalnum() or char == "_":
-                                flag_name += char
-                            else:
-                                break
-                        if flag_name:
-                            flags.add(flag_name)
+                flags.update(self._extract_flags_from_docstring(rule.condition_fn.__doc__))
 
-            # Also check amount functions for flag usage
+            # Extract flags from amount function's docstring
             if hasattr(rule.amount_fn, "__doc__") and rule.amount_fn.__doc__:
-                amount_expr = rule.amount_fn.__doc__
-                if "flags." in amount_expr:
-                    # Extract flag names from expressions like flags.under25, flags.children, etc.
-                    for part in amount_expr.split("flags.")[1:]:
-                        # Extract the flag name (stops at space, operator, etc.)
-                        flag_name = ""
-                        for char in part:
-                            if char.isalnum() or char == "_":
-                                flag_name += char
-                            else:
-                                break
-                        if flag_name:
-                            flags.add(flag_name)
+                flags.update(self._extract_flags_from_docstring(rule.amount_fn.__doc__))
 
         return sorted(list(flags))
+
+    @staticmethod
+    def _extract_flags_from_docstring(docstring: str) -> set[str]:
+        """Helper method to extract flag names from a docstring."""
+        flags = set()
+        if "flags." in docstring:
+            for part in docstring.split("flags.")[1:]:
+                flag_name = ""
+                for char in part:
+                    if char.isalnum() or char == "_":
+                        flag_name += char
+                    else:
+                        break
+                if flag_name:
+                    flags.add(flag_name)
+        return flags
