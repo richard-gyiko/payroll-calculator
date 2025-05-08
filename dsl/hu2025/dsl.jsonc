@@ -30,7 +30,10 @@
     /* Havi családi kedvezmény (adóalap-csökkentés) – Szja tv. 29/A. § */
     "FAM_ONE": 66670, // 1 eltartott
     "FAM_TWO": 133330, // 2 eltartott
-    "FAM_THREE": 220000 // 3 vagy több eltartott
+    "FAM_THREE": 220000, // 3 vagy több eltartott
+    "FAM_ONE_JULY": 100000, // 1 eltartott (2025. július 1-től)
+    "FAM_TWO_JULY": 200000, // 2 eltartott (2025. július 1-től)
+    "FAM_THREE_JULY": 330000 // 3 vagy több eltartott (2025. július 1-től),
   },
   /* =============================================================
      SZABÁLYOK
@@ -81,7 +84,15 @@
       "type": "credit",
       "direction": "employee",
       "amount": "((flags.children==1)*FAM_ONE + (flags.children==2)*FAM_TWO + (flags.children>=3)*FAM_THREE) * SZJA_RATE",
-      "condition": "flags.children >= 1"
+      "condition": "flags.children >= 1 and flags.date < '2025-07-01'"
+    },
+    {
+      "id": "family_allowance_credit_july",
+      "label": "Családi adókedvezmény (2025. július 1-től)",
+      "type": "credit",
+      "direction": "employee",
+      "amount": "((flags.children==1)*FAM_ONE_JULY + (flags.children==2)*FAM_TWO_JULY + (flags.children>=3)*FAM_THREE_JULY) * SZJA_RATE",
+      "condition": "flags.children >= 1 and flags.date >= '2025-07-01'"
     },
     /* ---------- 2) MUNKÁLTATÓI TÉTELEK ---------- */
     {
