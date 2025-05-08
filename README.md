@@ -18,6 +18,7 @@ This application provides a REST API and MCP Server for calculating employment-r
   - REST API with Swagger documentation
   - MCP server for AI agent integration
 - Docker support for easy deployment
+- DSL validation tool for ensuring rule files are correctly formatted
 
 ## Installation
 
@@ -174,6 +175,16 @@ Currently implemented rule sets:
 - [Hungarian Rules 2025](dsl/hu2025/README.md)
 
 For detailed information about the rule system and how to extend it, see the [DSL documentation](dsl/README.md).
+
+### Validating DSL Files
+
+The package includes a validation tool to check DSL files against the schema:
+
+```bash
+uv run src/payroll_tax_calculator/validate.py dsl/hu2024 dsl/hu2025
+```
+
+This ensures your rule files are correctly formatted before using them with the calculator.
 
 ## License
 
