@@ -30,15 +30,23 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
             detail=f"Year must be either 2024 or 2025, got {request.date.year}",
         )
 
-    json_path = Path(f"dsl/{request.country}{request.date.year}/dsl.jsonc")
-    if not json_path.exists():
+    # Try to find the DSL file with .yaml extension
+    base_path = f"dsl/{request.country}{request.date.year}/dsl"
+    yaml_path = Path(f"{base_path}.yaml")
+    yml_path = Path(f"{base_path}.yml")
+
+    if yaml_path.exists():
+        dsl_path = yaml_path
+    elif yml_path.exists():
+        dsl_path = yml_path
+    else:
         raise HTTPException(
             status_code=404,
-            detail=f"Configuration file for year {request.date.year} and country {request.country} not found",
+            detail=f"YAML configuration file for year {request.date.year} and country {request.country} not found",
         )
 
     try:
-        compiled, _, _ = load_rules(json_path)
+        compiled, _, _ = load_rules(dsl_path)
         engine = PayrollEngine(compiled)
 
         # Get required flags from the engine
@@ -90,15 +98,23 @@ def get_flags(request: Annotated[PayrollRequestModel, Query()]) -> FlagsResponse
             detail=f"Year must be either 2024 or 2025, got {request.date.year}",
         )
 
-    json_path = Path(f"dsl/{request.country}{request.date.year}/dsl.jsonc")
-    if not json_path.exists():
+    # Try to find the DSL file with .yaml extension
+    base_path = f"dsl/{request.country}{request.date.year}/dsl"
+    yaml_path = Path(f"{base_path}.yaml")
+    yml_path = Path(f"{base_path}.yml")
+
+    if yaml_path.exists():
+        dsl_path = yaml_path
+    elif yml_path.exists():
+        dsl_path = yml_path
+    else:
         raise HTTPException(
             status_code=404,
-            detail=f"Configuration file for year {request.date.year} and country {request.country} not found",
+            detail=f"YAML configuration file for year {request.date.year} and country {request.country} not found",
         )
 
     try:
-        compiled, _, _ = load_rules(json_path)
+        compiled, _, _ = load_rules(dsl_path)
         engine = PayrollEngine(compiled)
         flags = engine.get_flags()
 

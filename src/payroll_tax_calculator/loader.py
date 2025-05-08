@@ -1,12 +1,9 @@
-# loader.py
-"""Load payroll rules from a JSON file into executable :class:`CompiledRule`s."""
-
 from __future__ import annotations
 
-import json
-import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from ruamel.yaml import YAML
 
 from .rules import _RULE_REGISTRY, CompiledRule
 
@@ -15,25 +12,24 @@ from .rules import _RULE_REGISTRY, CompiledRule
 # ---------------------------------------------------------------------------
 
 
-_COMMENT_RE = re.compile(
-    r"""
-    (//[^\n]*$)           |   # // line comments
-    (/\*.*?\*/)               # /* block comments */
-    """,
-    re.MULTILINE | re.DOTALL | re.VERBOSE,
-)
-
-
-def _strip_json_comments(text: str) -> str:
-    """Return *text* with //... and /*...*/ comments removed."""
-    return re.sub(_COMMENT_RE, "", text)
-
-
 def load_rules(
     config_path: str | Path,
 ) -> Tuple[List[CompiledRule], Dict[str, Any], Dict[str, Any]]:
-    """Return (compiled_rules, meta, variables) from *config_path*."""
-    data = json.loads(_strip_json_comments(Path(config_path).read_text("utf-8")))
+    """Return (compiled_rules, meta, variables) from *config_path*.
+
+    Supports YAML (.yaml, .yml) file formats.
+    """
+    path = Path(config_path)
+
+    # Ensure file has YAML extension
+    if path.suffix.lower() not in (".yaml", ".yml"):
+        raise ValueError(
+            f"Unsupported file format: {path.suffix}. Only YAML (.yaml, .yml) files are supported."
+        )
+
+    # Load YAML file
+    yaml = YAML(typ="safe")
+    data = yaml.load(path.read_text("utf-8"))
 
     variables: Dict[str, Any] = data.get("variables", {})
     rule_specs: List[Dict[str, Any]] = data["rules"]

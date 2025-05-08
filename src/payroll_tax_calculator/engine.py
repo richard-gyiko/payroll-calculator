@@ -1,6 +1,3 @@
-# engine.py
-"""Execution engine + CLI wrapper for the JSON‑defined payroll rules."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -19,9 +16,14 @@ class PayrollEngine:
         self.rules = rules
 
     @classmethod
-    def from_json(cls, config_path: str | Path):
+    def from_yaml(cls, config_path: str | Path):
         compiled, *_ = load_rules(config_path)
         return cls(compiled)
+
+    @classmethod
+    def from_json(cls, config_path: str | Path):
+        """Legacy method kept for backward compatibility. Use from_yaml instead."""
+        return cls.from_yaml(config_path)
 
     def run(self, gross: int | float, **flags) -> Dict[str, Any]:
         ctx: Dict[str, Any] = {"gross": gross, "flags": flags}

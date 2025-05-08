@@ -17,7 +17,7 @@ def test_data_dir():
 @pytest.fixture
 def test_dsl_path(test_data_dir):
     """Return the path to the test DSL file."""
-    return test_data_dir / "test_dsl.jsonc"
+    return test_data_dir / "test_dsl.yaml"
 
 
 @pytest.fixture

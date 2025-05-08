@@ -1,0 +1,30 @@
+# This is a test DSL file for unit tests
+meta:
+  country: TEST
+  year: 2025
+  description: Test DSL file for unit tests
+variables:
+  TAX_RATE: 0.15
+  MIN_WAGE: 1000
+  MAX_DEDUCTION: 500
+rules:
+  - id: income_tax
+    label: Income Tax 15%
+    type: percentage
+    direction: employee
+    rate: TAX_RATE
+    base: gross
+    condition: "true"
+  - id: tax_credit
+    label: Tax Credit for Low Income
+    type: credit
+    direction: employee
+    amount: MIN_WAGE * 0.1
+    condition: gross < MIN_WAGE * 2
+  - id: employer_contribution
+    label: Employer Social Contribution
+    type: percentage
+    direction: employer
+    rate: "0.2"
+    base: gross
+    condition: "true"

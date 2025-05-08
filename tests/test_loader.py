@@ -1,13 +1,12 @@
 """Unit tests for the loader module."""
 
-import json
 import os
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from src.payroll_tax_calculator.loader import _strip_json_comments, load_rules
+from src.payroll_tax_calculator.loader import load_rules
 from src.payroll_tax_calculator.rules import _RULE_REGISTRY, CompiledRule
 
 
@@ -19,98 +18,72 @@ class TestLoader(unittest.TestCase):
         # Create a temporary directory for test files
         self.temp_dir = tempfile.TemporaryDirectory()
 
-        # Sample DSL content with comments
-        self.sample_dsl_with_comments = """
-        {
-            // This is a line comment
-            "meta": {
-                "country": "TEST",
-                "year": 2025
-                /* This is a 
-                   block comment */
-            },
-            "variables": {
-                "VAR1": 100,
-                "VAR2": 200 // Another comment
-            },
-            "rules": [
-                {
-                    "id": "rule1",
-                    "type": "percentage",
-                    "direction": "employee",
-                    "rate": "0.1",
-                    "base": "gross"
-                },
-                /* Commented rule
-                {
-                    "id": "rule2",
-                    "type": "credit",
-                    "amount": "100"
-                },
-                */
-                {
-                    "id": "rule3",
-                    "type": "credit",
-                    "amount": "VAR1"
-                }
-            ]
-        }
+        # Sample DSL content in YAML format
+        self.sample_dsl_yaml = """
+        meta:
+          country: TEST
+          year: 2025
+        variables:
+          VAR1: 100
+          VAR2: 200
+        rules:
+          - id: rule1
+            type: percentage
+            direction: employee
+            rate: '0.1'
+            base: gross
+          - id: rule3
+            type: credit
+            amount: VAR1
         """
 
         # Create a temporary DSL file
-        self.dsl_path = os.path.join(self.temp_dir.name, "test_dsl.jsonc")
+        self.dsl_path = os.path.join(self.temp_dir.name, "test_dsl.yaml")
         with open(self.dsl_path, "w") as f:
-            f.write(self.sample_dsl_with_comments)
+            f.write(self.sample_dsl_yaml)
 
     def tearDown(self):
         """Clean up test fixtures."""
         self.temp_dir.cleanup()
 
-    def test_strip_json_comments(self):
-        """Test _strip_json_comments function."""
-        # Test with line comments
-        text = '{"key": "value"} // This is a comment'
-        result = _strip_json_comments(text)
-        self.assertEqual(result, '{"key": "value"} ')
-
-        # Test with block comments
-        text = '{"key": /* comment */ "value"}'
-        result = _strip_json_comments(text)
-        self.assertEqual(result, '{"key":  "value"}')
-
-        # Test with multiline block comments
-        text = '{"key": "value" /* multi\nline\ncomment */}'
-        result = _strip_json_comments(text)
-        self.assertEqual(result, '{"key": "value" }')
-
-        # Test with nested comments (not supported in JSON but testing the regex)
-        text = '{"key": /* outer /* inner */ comment */ "value"}'
-        result = _strip_json_comments(text)
-        # The regex is non-greedy, so it should match the smallest block
-        self.assertEqual(result, '{"key":  comment */ "value"}')
-
     def test_load_rules_file_not_found(self):
         """Test load_rules with a non-existent file."""
         with self.assertRaises(FileNotFoundError):
-            load_rules("non_existent_file.json")
+            load_rules("non_existent_file.yaml")
 
-    def test_load_rules_invalid_json(self):
-        """Test load_rules with invalid JSON."""
-        # Create a file with invalid JSON
-        invalid_json_path = os.path.join(self.temp_dir.name, "invalid.json")
-        with open(invalid_json_path, "w") as f:
-            f.write("{invalid json")
+    def test_load_rules_invalid_extension(self):
+        """Test load_rules with an invalid file extension."""
+        # Create a file with invalid extension
+        invalid_ext_path = os.path.join(self.temp_dir.name, "invalid.json")
+        with open(invalid_ext_path, "w") as f:
+            f.write("{}")
 
-        with self.assertRaises(json.JSONDecodeError):
-            load_rules(invalid_json_path)
+        with self.assertRaises(ValueError) as context:
+            load_rules(invalid_ext_path)
+
+        self.assertIn("Unsupported file format", str(context.exception))
+
+    def test_load_rules_invalid_yaml(self):
+        """Test load_rules with invalid YAML."""
+        # Create a file with invalid YAML
+        invalid_yaml_path = os.path.join(self.temp_dir.name, "invalid.yaml")
+        with open(invalid_yaml_path, "w") as f:
+            f.write("invalid: yaml: content: - not properly formatted")
+
+        with self.assertRaises(Exception):
+            load_rules(invalid_yaml_path)
 
     @patch("src.payroll_tax_calculator.rules._RULE_REGISTRY")
     def test_load_rules_unknown_rule_type(self, mock_registry):
         """Test load_rules with an unknown rule type."""
         # Create a file with an unknown rule type
-        unknown_rule_path = os.path.join(self.temp_dir.name, "unknown_rule.json")
+        unknown_rule_path = os.path.join(self.temp_dir.name, "unknown_rule.yaml")
         with open(unknown_rule_path, "w") as f:
-            f.write('{"rules": [{"id": "rule1", "type": "unknown_type"}]}')
+            f.write("""
+            rules:
+              - id: rule1
+                type: unknown_type
+            """)
 
         # Mock the registry to not contain the unknown type
         mock_registry.__contains__.return_value = False
