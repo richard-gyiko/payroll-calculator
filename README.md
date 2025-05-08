@@ -1,5 +1,7 @@
 # Payroll Tax Calculator
 
+![Docker Image Version](https://img.shields.io/docker/v/gyikesz/payroll-tax-calculator)
+
 A flexible, rule-based calculator for employee taxes that determines net salary and employer costs based on various personal conditions and tax rules.
 
 ## Overview
@@ -31,7 +33,7 @@ This application provides a REST API and MCP Server for calculating employment-r
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/payroll-tax-calculator.git
+   git clone https://github.com/richard-gyiko/payroll-tax-calculator
    cd payroll-tax-calculator
    ```
 
@@ -47,14 +49,19 @@ This application provides a REST API and MCP Server for calculating employment-r
 
 ### Docker Setup
 
-1. Build the Docker image:
+1. Pull the Docker image directly from DockerHub:
    ```bash
-   docker build -t tax-calculator .
+   docker pull gyikesz/payroll-tax-calculator
+   ```
+
+   Or build the Docker image locally:
+   ```bash
+   docker build -t payroll-tax-calculator .
    ```
 
 2. Run the container:
    ```bash
-   docker run -p 8000:8000 tax-calculator
+   docker run -p 8000:8000 gyikesz/payroll-tax-calculator
    ```
 
 ## API Usage
