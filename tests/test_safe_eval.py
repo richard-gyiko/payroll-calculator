@@ -6,10 +6,10 @@ from types import SimpleNamespace
 
 from src.payroll_tax_calculator.safe_eval import (
     SafeEvalError,
-    safe_eval,
-    compile_safe_expr,
-    _Validator,
     _to_namespace,
+    _Validator,
+    compile_safe_expr,
+    safe_eval,
 )
 
 

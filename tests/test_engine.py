@@ -1,7 +1,7 @@
 """Unit tests for the engine module."""
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from src.payroll_tax_calculator.engine import PayrollEngine
 from src.payroll_tax_calculator.rules import CompiledRule
@@ -41,7 +41,7 @@ class TestPayrollEngine(unittest.TestCase):
         self.assertEqual(self.engine.rules[1].id, "rule2")
         self.assertEqual(self.engine.rules[2].id, "rule3")
 
-    @patch('src.payroll_tax_calculator.engine.load_rules')
+    @patch("src.payroll_tax_calculator.engine.load_rules")
     def test_from_json(self, mock_load_rules):
         """Test PayrollEngine.from_json factory method."""
         # Setup mock
@@ -71,9 +71,11 @@ class TestPayrollEngine(unittest.TestCase):
         self.assertEqual(result["gross"], 1000)
         self.assertEqual(result["net"], 900)  # 1000 - 100 (rule1)
         self.assertEqual(result["super_gross"], 1200)  # 1000 + 200 (rule2)
-        
+
         # Check breakdown
-        self.assertEqual(len(result["breakdown"]), 2)  # rule3 returns 0, so not included
+        self.assertEqual(
+            len(result["breakdown"]), 2
+        )  # rule3 returns 0, so not included
         self.assertEqual(result["breakdown"]["rule1"]["amount"], -100.0)
         self.assertEqual(result["breakdown"]["rule1"]["direction"], "employee")
         self.assertEqual(result["breakdown"]["rule2"]["amount"], 200.0)
@@ -83,7 +85,7 @@ class TestPayrollEngine(unittest.TestCase):
         """Test PayrollEngine.run with no rules."""
         engine = PayrollEngine([])
         result = engine.run(1000)
-        
+
         # With no rules, net should equal gross and super_gross should equal gross
         self.assertEqual(result["gross"], 1000)
         self.assertEqual(result["net"], 1000)
@@ -115,7 +117,9 @@ class TestPayrollEngine(unittest.TestCase):
         flags = engine.get_flags()
 
         # Check that all flags were extracted and sorted
-        self.assertEqual(flags, ["children", "months_on_job", "mother_under30", "student", "under25"])
+        self.assertEqual(
+            flags, ["children", "months_on_job", "mother_under30", "student", "under25"]
+        )
 
     def test_extract_flags_from_docstring(self):
         """Test _extract_flags_from_docstring static method."""

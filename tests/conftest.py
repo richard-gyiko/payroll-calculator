@@ -47,14 +47,7 @@ def mock_compiled_rules():
 @pytest.fixture
 def sample_context():
     """Return a sample context dictionary for testing."""
-    return {
-        "gross": 1000,
-        "flags": {
-            "under25": True,
-            "student": False,
-            "children": 2
-        }
-    }
+    return {"gross": 1000, "flags": {"under25": True, "student": False, "children": 2}}
 
 
 @pytest.fixture
@@ -64,11 +57,11 @@ def sample_breakdown():
         "income_tax": {
             "label": "Income Tax 15%",
             "amount": -150.0,
-            "direction": "employee"
+            "direction": "employee",
         },
         "tax_credit": {
             "label": "Tax Credit for Low Income",
             "amount": 100.0,
-            "direction": "employee"
-        }
+            "direction": "employee",
+        },
     }

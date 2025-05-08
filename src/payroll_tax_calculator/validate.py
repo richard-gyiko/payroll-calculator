@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 
 import jsonschema
+
 from .loader import _strip_json_comments
 
 
