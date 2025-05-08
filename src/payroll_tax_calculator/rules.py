@@ -76,6 +76,8 @@ class PercentageRule(_Registrable):
         base_fn = compile_safe_expr(spec.get("base", "gross"), variables)
         cond_fn = compile_safe_expr(spec.get("condition", "true"), variables)
         direction: str = spec.get("direction", "employee")
+        if direction not in {"employee", "employer", "neutral"}:
+            raise ValueError(f"{rid}: invalid direction {direction}")
         sign = -1 if direction == "employee" else +1
 
         def amount_fn(ctx, results, rf=rate_fn, bf=base_fn, s=sign):
@@ -97,6 +99,8 @@ class CreditRule(_Registrable):
         cond_fn = compile_safe_expr(spec.get("condition", "true"), variables)
 
         direction = spec.get("direction", "neutral")  # accept employer/employee
+        if direction not in {"employee", "employer", "neutral"}:
+            raise ValueError(f"{rid}: invalid direction {direction}")
         return CompiledRule(rid, label, direction, amt_fn, cond_fn)
 
 
