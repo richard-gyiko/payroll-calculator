@@ -1,6 +1,7 @@
 # Payroll Tax Calculator
 
 ![Docker Image Version](https://img.shields.io/docker/v/gyikesz/payroll-tax-calculator)
+[![codecov](https://codecov.io/gh/richard-gyiko/payroll-tax-calculator/graph/badge.svg?token=9HG1ZZGMML)](https://codecov.io/gh/richard-gyiko/payroll-tax-calculator)
 
 A flexible, rule-based calculator for employee taxes that determines net salary and employer costs based on various personal conditions and tax rules.
 
