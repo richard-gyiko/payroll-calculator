@@ -80,31 +80,41 @@ Once running, the API is available at http://localhost:8000 with the following e
 **Response:**
 ```json
 {
-  "year": 2024,
-  "gross": 500000,
-  "net": 332500,
-  "super_gross": 565000,
+  "year": 2025,
+  "gross": 480000,
+  "net": 391200,
+  "super_gross": 504596,
   "flags": {
     "mother_under30": false,
-    "under25": false,
+    "under25": true,
     "children": 0,
-    "entrant": false,
-    "months_on_job": 12
+    "entrant": true,
+    "months_on_job": 6
   },
   "breakdown": {
     "tb_jarulek": {
       "label": "TB-járulék 18,5 %",
-      "amount": -92500,
+      "amount": -88800,
       "direction": "employee"
     },
     "szja_full": {
       "label": "SZJA 15 %",
-      "amount": -75000,
+      "amount": -72000,
+      "direction": "employee"
+    },
+    "under25_credit": {
+      "label": "25 év alatti SZJA-jóváírás",
+      "amount": 72000,
       "direction": "employee"
     },
     "szocho_full": {
       "label": "SZOCHO 13 %",
-      "amount": 65000,
+      "amount": 62400,
+      "direction": "employer"
+    },
+    "entrant_full_credit": {
+      "label": "SZOCHO-kedvezmény 0 % (minimálbérig, 1-12. hó)",
+      "amount": -37804,
       "direction": "employer"
     }
   }

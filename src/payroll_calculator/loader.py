@@ -43,7 +43,7 @@ def load_rules(
         rtype = spec["type"]
         if rtype not in _RULE_REGISTRY:
             raise KeyError(
-                f"Unknown rule type: {rtype}. Did you forget to register a plug‑in?"
+                f"Unknown rule type: {rtype}. Did you forget to register a plugin?"
             )
         compiled.append(_RULE_REGISTRY[rtype].compile(spec, variables))
 

@@ -17,7 +17,6 @@ class SafeEvalError(RuntimeError):
 _ALLOWED_NODES: set[type[ast.AST]] = {
     ast.Expression,
     ast.Constant,
-    ast.Num,
     ast.Name,
     ast.BinOp,
     ast.UnaryOp,
@@ -34,7 +33,7 @@ _ALLOWED_NODES: set[type[ast.AST]] = {
     ast.USub,
     ast.And,
     ast.Or,
-    ast.Not,  # logical NOT now allowed
+    ast.Not,
     ast.Eq,
     ast.NotEq,
     ast.Gt,
@@ -44,8 +43,7 @@ _ALLOWED_NODES: set[type[ast.AST]] = {
     ast.Call,
     ast.Load,
     ast.Subscript,
-    ast.Index,
-    ast.Attribute,  # flags.foo
+    ast.Attribute,
 }
 
 _ALLOWED_UNARY_OPS: Tuple[type[ast.unaryop], ...] = (ast.UAdd, ast.USub, ast.Not)
