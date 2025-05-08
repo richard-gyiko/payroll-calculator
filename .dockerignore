@@ -1,0 +1,7 @@
+.aider*
+.venv
+.ruff_cache
+.git
+.dockerignore
+.gitignore
+__pycache__

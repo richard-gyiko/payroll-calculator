@@ -1,0 +1,15 @@
+[project]
+name = "payroll_tax_calculator"
+version = "0.1.0"
+description = "A flexible, rule-based calculator for employee taxes and contributions"
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi-mcp>=0.3.3",
+]
+
+[dependency-groups]
+dev = [
+    "jsonschema>=4.23.0",
+]

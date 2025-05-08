@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Payroll Tax DSL Schema",
+  "description": "Schema for payroll tax calculation DSL files",
+  "type": "object",
+  "required": ["meta", "variables", "rules"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["country", "year", "description"],
+      "properties": {
+        "country": {
+          "type": "string",
+          "description": "Country code (e.g., 'HU')"
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year for which the rules apply"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the tax rules"
+        }
+      }
+    },
+    "variables": {
+      "type": "object",
+      "description": "Constants used in tax calculations",
+      "additionalProperties": {
+        "type": ["number", "integer"],
+        "description": "Value of the constant"
+      }
+    },
+    "rules": {
+      "type": "array",
+      "description": "Tax calculation rules",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "type"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the rule"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable label for the rule"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["percentage", "credit"],
+            "description": "Type of rule: percentage or credit"
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["employee", "employer"],
+            "description": "Direction of the tax/credit (required for percentage rules)"
+          },
+          "rate": {
+            "type": "string",
+            "description": "Rate expression for percentage rules"
+          },
+          "base": {
+            "type": "string",
+            "description": "Base expression for percentage rules"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount expression for credit rules"
+          },
+          "condition": {
+            "type": "string",
+            "description": "Optional condition expression that determines if the rule applies"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "type": { "enum": ["percentage"] } }
+            },
+            "then": {
+              "required": ["direction", "rate", "base"]
+            }
+          },
+          {
+            "if": {
+              "properties": { "type": { "enum": ["credit"] } }
+            },
+            "then": {
+              "required": ["direction", "amount"]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
