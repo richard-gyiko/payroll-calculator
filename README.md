@@ -1,22 +1,22 @@
-# Hungarian Tax Calculator
+# Payroll Tax Calculator
 
-A simplified tax calculator for Hungarian employee salaries that calculates net salary and employer costs based on various personal conditions and tax rules.
+A flexible, rule-based calculator for employee taxes that determines net salary and employer costs based on various personal conditions and tax rules.
 
 ## Overview
 
-This application provides a REST API for calculating payroll taxes in Hungary for the years 2024 and 2025. It uses a flexible rule-based system defined in JSONC files to determine tax calculations based on various personal conditions.
+This application provides a REST API and MCP Server for calculating employment-related taxes and contributions using a flexible rule-based system defined in JSONC files. While it comes with Hungarian tax rules for 2024 and 2025, the engine is country-agnostic and can be extended with any valid DSL configuration.
 
 ## Features
 
 - Calculate net salary and employer costs based on gross salary
-- Support for special tax conditions:
-  - Mothers under 30 years old
-  - Employees under 25 years old
-  - Number of dependent children
-  - First-time job entrants
-  - Employment duration
+- Rule-based engine with support for:
+  - Percentage-based calculations
+  - Fixed credits
+  - Conditional rules based on personal circumstances
 - Detailed breakdown of all tax components
-- API with Swagger documentation
+- Dual integration options:
+  - REST API with Swagger documentation
+  - MCP server for AI agent integration
 - Docker support for easy deployment
 
 ## Installation
@@ -30,8 +30,8 @@ This application provides a REST API for calculating payroll taxes in Hungary fo
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/hungarian-tax-calculator.git
-   cd hungarian-tax-calculator
+   git clone https://github.com/yourusername/payroll-tax-calculator.git
+   cd payroll-tax-calculator
    ```
 
 2. Install dependencies:
@@ -41,7 +41,7 @@ This application provides a REST API for calculating payroll taxes in Hungary fo
 
 3. Run the application:
    ```bash
-   uv run src/tax_calculator/api.py
+   uv run src/payroll_calculator/api.py
    ```
 
 ### Docker Setup
@@ -58,7 +58,12 @@ This application provides a REST API for calculating payroll taxes in Hungary fo
 
 ## API Usage
 
-Once running, the API is available at http://localhost:8000 with the following endpoints:
+This application provides two interfaces:
+
+1. **REST API**: Available at http://localhost:8000
+2. **MCP Server**: Available at http://localhost:8000/mcp
+
+### REST API
 
 ### Calculate Payroll
 
@@ -121,20 +126,54 @@ Once running, the API is available at http://localhost:8000 with the following e
 }
 ```
 
+### MCP Server
+
+The application also exposes an MCP (Model Context Protocol) server at http://localhost:8000/mcp. This allows AI agents to interact with the tax calculator directly.
+
+MCP is an emerging standard that defines how AI agents communicate with applications. The MCP server exposes the same functionality as the REST API but in a format that can be consumed by AI assistants and tools that support the MCP protocol.
+
+To connect an MCP client to the server:
+
+```json
+{
+  "mcpServers": {
+    "payroll-tax-calculator": {
+      "url": "http://localhost:8000/mcp"
+    }
+  }
+}
+```
+
+For clients that don't support SSE or if you need authentication, you can use mcp-remote as a bridge:
+
+```json
+{
+  "mcpServers": {
+    "payroll-tax-calculator": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://localhost:8000/mcp",
+        "8080"
+      ]
+    }
+  }
+}
+```
+
 ## Documentation
 
 API documentation is available at http://localhost:8000/docs when the server is running.
 
 ## Rule System
 
-Tax rules are defined in JSONC files in the `dsl` directory:
-- `dsl/hu2024.jsonc` - Rules for 2024
-- `dsl/hu2025.jsonc` - Rules for 2025
+The calculator uses a flexible Domain-Specific Language (DSL) to define tax rules. The engine is country-agnostic and can work with any valid rule configuration.
 
-The rule system supports:
-- Percentage-based calculations
-- Fixed credits
-- Conditional rules based on personal circumstances
+Currently implemented rule sets:
+- [Hungarian Rules 2024](dsl/hu2024/README.md)
+- [Hungarian Rules 2025](dsl/hu2025/README.md)
+
+For detailed information about the rule system and how to extend it, see the [DSL documentation](dsl/README.md).
 
 ## License
 

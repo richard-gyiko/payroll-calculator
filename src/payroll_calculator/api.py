@@ -16,8 +16,9 @@ app = FastAPI(
 class PayrollRequest(BaseModel):
     """Request model for payroll calculation."""
 
+    country: str = Field("hu", description="Country code (e.g., 'hu' for Hungary)")
     year: int = Field(..., description="Year to calculate (2024 or 2025)")
-    gross: int = Field(..., description="Gross salary in HUF")
+    gross: int = Field(..., description="Gross salary")
     mother_under30: bool = Field(False, description="Mother under 30 years old")
     under25: bool = Field(False, description="Person under 25 years old")
     children: int = Field(0, description="Number of children")
@@ -47,11 +48,11 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
             detail=f"Year must be either 2024 or 2025, got {request.year}",
         )
 
-    json_path = Path(f"dsl/hu{request.year}.jsonc")
+    json_path = Path(f"dsl/{request.country}{request.year}/dsl.jsonc")
     if not json_path.exists():
         raise HTTPException(
             status_code=404,
-            detail=f"Configuration file for year {request.year} not found",
+            detail=f"Configuration file for year {request.year} and country {request.country} not found",
         )
 
     flags = {

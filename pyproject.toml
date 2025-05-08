@@ -1,7 +1,7 @@
 [project]
-name = "payroll-calculator"
+name = "payroll-tax-calculator"
 version = "0.1.0"
-description = "A simplified payroll calculator for Hungarian employee salaries"
+description = "A flexible, rule-based calculator for employee taxes and contributions"
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.13"
