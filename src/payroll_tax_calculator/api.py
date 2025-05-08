@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 from typing import Any, Dict
 
@@ -16,8 +17,10 @@ app = FastAPI(
 class PayrollRequest(BaseModel):
     """Request model for payroll calculation."""
 
-    country: str = Field("hu", description="Country code (e.g., 'hu' for Hungary)")
-    year: int = Field(..., description="Year to calculate (2024 or 2025)")
+    country: str = Field(..., description="Country code (e.g., 'hu' for Hungary)")
+    date: datetime.date = Field(
+        ..., description="Date of the payroll calculation (YYYY-MM-DD)"
+    )
     gross: int = Field(..., description="Gross salary")
     mother_under30: bool = Field(False, description="Mother under 30 years old")
     under25: bool = Field(False, description="Person under 25 years old")
@@ -29,7 +32,7 @@ class PayrollRequest(BaseModel):
 class PayrollResponse(BaseModel):
     """Response model for payroll calculation."""
 
-    year: int
+    date: datetime.date
     gross: int
     net: float
     super_gross: float
@@ -42,17 +45,17 @@ class PayrollResponse(BaseModel):
 )
 async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
     """Calculate wage with tax deductions for the given year."""
-    if request.year not in (2024, 2025):
+    if request.date.year not in (2024, 2025):
         raise HTTPException(
             status_code=400,
-            detail=f"Year must be either 2024 or 2025, got {request.year}",
+            detail=f"Year must be either 2024 or 2025, got {request.date.year}",
         )
 
-    json_path = Path(f"dsl/{request.country}{request.year}/dsl.jsonc")
+    json_path = Path(f"dsl/{request.country}{request.date.year}/dsl.jsonc")
     if not json_path.exists():
         raise HTTPException(
             status_code=404,
-            detail=f"Configuration file for year {request.year} and country {request.country} not found",
+            detail=f"Configuration file for year {request.date.year} and country {request.country} not found",
         )
 
     flags = {
@@ -61,6 +64,7 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
         "children": request.children,
         "entrant": request.entrant,
         "months_on_job": request.months_on_job,
+        "date": request.date.strftime("%Y-%m-%d"),
     }
 
     try:
@@ -69,7 +73,7 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
         result = engine.run(request.gross, **flags)
 
         return PayrollResponse(
-            year=request.year,
+            date=request.date,
             gross=request.gross,
             net=result["net"],
             super_gross=result["super_gross"],
