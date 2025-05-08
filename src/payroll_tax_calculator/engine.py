@@ -55,7 +55,7 @@ class PayrollEngine:
     def get_flags(self) -> List[str]:
         """Extract and return all flag names used in rule conditions."""
         flags = set()
-        
+
         # Examine each rule's condition function's docstring
         # The docstring contains the original expression
         for rule in self.rules:
@@ -73,5 +73,5 @@ class PayrollEngine:
                                 break
                         if flag_name:
                             flags.add(flag_name)
-        
+
         return sorted(list(flags))

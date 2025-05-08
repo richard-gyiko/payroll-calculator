@@ -22,11 +22,9 @@ class PayrollRequest(BaseModel):
         ..., description="Date of the payroll calculation (YYYY-MM-DD)"
     )
     gross: int = Field(..., description="Gross salary")
-    mother_under30: bool = Field(False, description="Mother under 30 years old")
-    under25: bool = Field(False, description="Person under 25 years old")
-    children: int = Field(0, description="Number of children")
-    entrant: bool = Field(False, description="First-time job entrant")
-    months_on_job: int = Field(0, description="Months on current job")
+    flags: Dict[str, Any] = Field(
+        default_factory=dict, description="Dynamic flags for calculation"
+    )
 
 
 class PayrollResponse(BaseModel):
@@ -58,14 +56,9 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
             detail=f"Configuration file for year {request.date.year} and country {request.country} not found",
         )
 
-    flags = {
-        "mother_under30": request.mother_under30,
-        "under25": request.under25,
-        "children": request.children,
-        "entrant": request.entrant,
-        "months_on_job": request.months_on_job,
-        "date": request.date.strftime("%Y-%m-%d"),
-    }
+    # Start with the provided flags and add the date
+    flags = request.flags.copy()
+    flags["date"] = request.date.strftime("%Y-%m-%d")
 
     try:
         compiled, _, _ = load_rules(json_path)
