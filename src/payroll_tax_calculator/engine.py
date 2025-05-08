@@ -6,8 +6,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, List
 
-from loader import load_rules
-from rules import CompiledRule
+from .loader import load_rules
+from .rules import CompiledRule
 
 __all__ = ["PayrollEngine"]
 
