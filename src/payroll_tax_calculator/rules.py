@@ -74,7 +74,7 @@ class PercentageRule(_Registrable):
         label = spec.get("label", rid)
         rate_fn = compile_safe_expr(spec["rate"], variables)
         base_fn = compile_safe_expr(spec.get("base", "gross"), variables)
-        cond_fn = compile_safe_expr(spec.get("condition", "true"), variables)
+        cond_fn = (lambda *_: True) if "condition" not in spec else compile_safe_expr(spec["condition"], variables)
         direction: str = spec.get("direction", "employee")
         if direction not in {"employee", "employer", "neutral"}:
             raise ValueError(f"{rid}: invalid direction {direction}")
@@ -96,7 +96,7 @@ class CreditRule(_Registrable):
         rid = spec["id"]
         label = spec.get("label", rid)
         amt_fn = compile_safe_expr(spec["amount"], variables)
-        cond_fn = compile_safe_expr(spec.get("condition", "true"), variables)
+        cond_fn = (lambda *_: True) if "condition" not in spec else compile_safe_expr(spec["condition"], variables)
 
         direction = spec.get("direction", "neutral")  # accept employer/employee
         if direction not in {"employee", "employer", "neutral"}:
