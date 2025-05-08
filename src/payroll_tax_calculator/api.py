@@ -1,44 +1,21 @@
-import datetime
 from pathlib import Path
-from typing import Annotated, Any, Dict
+from typing import Annotated
 
+from api_contracts import (
+    FlagsResponse,
+    PayrollRequest,
+    PayrollRequestModel,
+    PayrollResponse,
+)
 from engine import PayrollEngine
 from fastapi import FastAPI, HTTPException, Query
 from fastapi_mcp import FastApiMCP
 from loader import load_rules
-from pydantic import BaseModel, Field
 
 app = FastAPI(
     title="Tax Calculator API",
     description="API for calculating taxes based on salary and personal conditions",
 )
-
-
-class PayrollRequestModel(BaseModel):
-    country: str = Field(..., description="Country code (e.g., 'hu' for Hungary)")
-    date: datetime.date = Field(
-        ..., description="Date of the payroll calculation (YYYY-MM-DD)"
-    )
-
-
-class PayrollRequest(PayrollRequestModel):
-    """Request model for payroll calculation."""
-
-    gross: int = Field(..., description="Gross salary")
-    flags: Dict[str, Any] = Field(
-        default_factory=dict, description="Dynamic flags for calculation"
-    )
-
-
-class PayrollResponse(BaseModel):
-    """Response model for payroll calculation."""
-
-    date: datetime.date
-    gross: int
-    net: float
-    super_gross: float
-    flags: Dict[str, Any]
-    breakdown: Dict[str, Dict[str, Any]]
 
 
 @app.post(
@@ -104,8 +81,8 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
         raise HTTPException(status_code=500, detail=f"Calculation error: {str(e)}")
 
 
-@app.get("/flags", operation_id="get_payroll_flags")
-def get_flags(request: Annotated[PayrollRequestModel, Query()]) -> Dict[str, Any]:
+@app.get("/flags", operation_id="get_payroll_flags", response_model=FlagsResponse)
+def get_flags(request: Annotated[PayrollRequestModel, Query()]) -> FlagsResponse:
     """Get available flags for the given calculation."""
     if request.date.year not in (2024, 2025):
         raise HTTPException(
@@ -128,7 +105,7 @@ def get_flags(request: Annotated[PayrollRequestModel, Query()]) -> Dict[str, Any
         # Exclude 'date' from the flags as it's provided in the request
         flags = [flag for flag in flags if flag != "date"]
 
-        return {"flags": flags}
+        return FlagsResponse(flags=flags)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving flags: {str(e)}")
 
