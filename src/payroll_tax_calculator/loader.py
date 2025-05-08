@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from rules import _RULE_REGISTRY, CompiledRule
+from .rules import _RULE_REGISTRY, CompiledRule
 
 # ---------------------------------------------------------------------------
 # Public helper

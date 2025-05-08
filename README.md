@@ -1,6 +1,7 @@
 # Payroll Tax Calculator
 
 ![Docker Image Version](https://img.shields.io/docker/v/gyikesz/payroll-tax-calculator)
+[![codecov](https://codecov.io/gh/richard-gyiko/payroll-tax-calculator/graph/badge.svg?token=9HG1ZZGMML)](https://codecov.io/gh/richard-gyiko/payroll-tax-calculator)
 
 A flexible, rule-based calculator for employee taxes that determines net salary and employer costs based on various personal conditions and tax rules.
 
@@ -172,6 +173,62 @@ For clients that don't support SSE or if you need authentication, you can use mc
 ## Documentation
 
 API documentation is available at http://localhost:8000/docs when the server is running.
+
+## Testing
+
+The project includes a comprehensive test suite to ensure reliability and correctness.
+
+### Test Structure
+
+- `test_engine.py`: Tests for the `PayrollEngine` class
+- `test_loader.py`: Tests for the DSL file loading functionality
+- `test_safe_eval.py`: Tests for the safe expression evaluation module
+- `test_integration.py`: Integration tests that verify the components working together
+- `conftest.py`: Common pytest fixtures used across test files
+- `data/`: Directory containing test data files
+
+### Running Tests Locally
+
+To run all tests:
+
+```bash
+pytest
+```
+
+To run tests with coverage report:
+
+```bash
+pytest --cov=src/payroll_tax_calculator --cov-report=term-missing
+```
+
+To run a specific test file:
+
+```bash
+pytest tests/test_engine.py
+```
+
+### Test Coverage
+
+The tests aim to cover:
+
+1. Normal operation scenarios
+2. Edge cases
+3. Error handling
+4. Security restrictions (especially for safe_eval)
+
+### Test Dependencies
+
+The test suite requires the following dependencies, which are included in the dev dependencies:
+
+```bash
+uv sync --dev
+```
+
+This will install:
+- pytest: Testing framework
+- pytest-cov: Coverage reporting
+
+For more detailed information about testing, see the [Tests README](tests/README.md).
 
 ## Rule System
 

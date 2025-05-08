@@ -6,8 +6,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, List
 
-from loader import load_rules
-from rules import CompiledRule
+from .loader import load_rules
+from .rules import CompiledRule
 
 __all__ = ["PayrollEngine"]
 
@@ -59,7 +59,9 @@ class PayrollEngine:
         for rule in self.rules:
             # Extract flags from condition function's docstring
             if hasattr(rule.condition_fn, "__doc__") and rule.condition_fn.__doc__:
-                flags.update(self._extract_flags_from_docstring(rule.condition_fn.__doc__))
+                flags.update(
+                    self._extract_flags_from_docstring(rule.condition_fn.__doc__)
+                )
 
             # Extract flags from amount function's docstring
             if hasattr(rule.amount_fn, "__doc__") and rule.amount_fn.__doc__:

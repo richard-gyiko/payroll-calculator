@@ -1,16 +1,17 @@
 from pathlib import Path
 from typing import Annotated
 
-from api_contracts import (
+from fastapi import FastAPI, HTTPException, Query
+from fastapi_mcp import FastApiMCP
+
+from .api_contracts import (
     FlagsResponse,
     PayrollRequest,
     PayrollRequestModel,
     PayrollResponse,
 )
-from engine import PayrollEngine
-from fastapi import FastAPI, HTTPException, Query
-from fastapi_mcp import FastApiMCP
-from loader import load_rules
+from .engine import PayrollEngine
+from .loader import load_rules
 
 app = FastAPI(
     title="Tax Calculator API",

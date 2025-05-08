@@ -18,7 +18,8 @@ import sys
 from pathlib import Path
 
 import jsonschema
-from loader import _strip_json_comments
+
+from .loader import _strip_json_comments
 
 
 def validate_dsl_file(file_path: Path, schema_path: Path) -> bool:

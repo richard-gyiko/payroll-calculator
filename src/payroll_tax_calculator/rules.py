@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Protocol
 
-from safe_eval import compile_safe_expr
+from .safe_eval import compile_safe_expr
 
 # ---------------------------------------------------------------------------
 # Core dataclass used at run-time by the engine

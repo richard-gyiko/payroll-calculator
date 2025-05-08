@@ -5,3 +5,8 @@
 .dockerignore
 .gitignore
 __pycache__
+.github
+
+tests
+.coverage
+.pytest_cache
