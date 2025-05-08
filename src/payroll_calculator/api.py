@@ -1,12 +1,11 @@
 from pathlib import Path
-from typing import Dict, Any
-
-from fastapi import FastAPI, HTTPException
-from fastapi_mcp import FastApiMCP
-from pydantic import BaseModel, Field
+from typing import Any, Dict
 
 from engine import PayrollEngine
+from fastapi import FastAPI, HTTPException
+from fastapi_mcp import FastApiMCP
 from loader import load_rules
+from pydantic import BaseModel, Field
 
 app = FastAPI(
     title="Tax Calculator API",

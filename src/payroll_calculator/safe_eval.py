@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import ast
@@ -17,21 +16,39 @@ class SafeEvalError(RuntimeError):
 # ──────────────────── whitelist tables ────────────────────────────────────
 _ALLOWED_NODES: set[type[ast.AST]] = {
     ast.Expression,
-    ast.Constant, ast.Num, ast.Name,
-    ast.BinOp, ast.UnaryOp, ast.BoolOp, ast.Compare,
-    ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow,
-    ast.UAdd, ast.USub,
-    ast.And, ast.Or, ast.Not,                         # logical NOT now allowed
-    ast.Eq, ast.NotEq, ast.Gt, ast.GtE, ast.Lt, ast.LtE,
+    ast.Constant,
+    ast.Num,
+    ast.Name,
+    ast.BinOp,
+    ast.UnaryOp,
+    ast.BoolOp,
+    ast.Compare,
+    ast.Add,
+    ast.Sub,
+    ast.Mult,
+    ast.Div,
+    ast.FloorDiv,
+    ast.Mod,
+    ast.Pow,
+    ast.UAdd,
+    ast.USub,
+    ast.And,
+    ast.Or,
+    ast.Not,  # logical NOT now allowed
+    ast.Eq,
+    ast.NotEq,
+    ast.Gt,
+    ast.GtE,
+    ast.Lt,
+    ast.LtE,
     ast.Call,
     ast.Load,
-    ast.Subscript, ast.Index,
-    ast.Attribute,                                    # flags.foo
+    ast.Subscript,
+    ast.Index,
+    ast.Attribute,  # flags.foo
 }
 
-_ALLOWED_UNARY_OPS: Tuple[type[ast.unaryop], ...] = (
-    ast.UAdd, ast.USub, ast.Not
-)
+_ALLOWED_UNARY_OPS: Tuple[type[ast.unaryop], ...] = (ast.UAdd, ast.USub, ast.Not)
 
 _ALLOWED_FUNCTIONS: dict[str, Any] = {
     "abs": abs,
@@ -55,16 +72,12 @@ _ALLOWED_CONSTANTS: Mapping[str, Any] = {
 class _Validator(ast.NodeVisitor):
     def generic_visit(self, node: ast.AST) -> None:  # noqa: D401
         if type(node) not in _ALLOWED_NODES:
-            raise SafeEvalError(
-                f"Disallowed expression node: {type(node).__name__}"
-            )
+            raise SafeEvalError(f"Disallowed expression node: {type(node).__name__}")
         super().generic_visit(node)
 
     def visit_UnaryOp(self, node: ast.UnaryOp) -> None:
         if type(node.op) not in _ALLOWED_UNARY_OPS:
-            raise SafeEvalError(
-                f"Disallowed unary operator: {type(node.op).__name__}"
-            )
+            raise SafeEvalError(f"Disallowed unary operator: {type(node.op).__name__}")
         self.generic_visit(node)
 
     def visit_Attribute(self, node: ast.Attribute) -> None:
