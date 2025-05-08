@@ -74,7 +74,6 @@ async def calculate_payroll(request: PayrollRequest) -> PayrollResponse:
             gross=request.gross,
             net=result["net"],
             super_gross=result["super_gross"],
-            flags=flags,
             breakdown=result["breakdown"],
         )
     except Exception as e:

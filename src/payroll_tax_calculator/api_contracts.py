@@ -23,6 +23,17 @@ class PayrollRequest(PayrollRequestModel):
     )
 
 
+class BreakdownItem(BaseModel):
+    """Model for a single breakdown item in the payroll calculation."""
+
+    label: str = Field(..., description="Human-readable label for the tax rule")
+    amount: float = Field(..., description="Amount of the tax calculation")
+    direction: str = Field(
+        ...,
+        description="Direction of the tax flow: 'employee', 'employer', or 'neutral'",
+    )
+
+
 class PayrollResponse(BaseModel):
     """Response model for payroll calculation."""
 
@@ -30,8 +41,22 @@ class PayrollResponse(BaseModel):
     gross: int
     net: float
     super_gross: float
-    flags: Dict[str, Any]
-    breakdown: Dict[str, Dict[str, Any]]
+    breakdown: Dict[str, BreakdownItem] = Field(
+        ...,
+        description="Breakdown of tax calculations with rule ID as key and details including label, amount, and direction",
+        example={
+            "tb_jarulek": {
+                "label": "TB-járulék 18,5 %",
+                "amount": -18500.0,
+                "direction": "employee",
+            },
+            "szja_full": {
+                "label": "SZJA 15 %",
+                "amount": -15000.0,
+                "direction": "employee",
+            },
+        },
+    )
 
 
 class FlagsResponse(BaseModel):
