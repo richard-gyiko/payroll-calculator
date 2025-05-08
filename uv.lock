@@ -208,7 +208,7 @@ wheels = [
 ]
 
 [[package]]
-name = "payroll-calculator"
+name = "payroll-tax-calculator"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

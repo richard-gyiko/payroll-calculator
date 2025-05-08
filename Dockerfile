@@ -10,4 +10,4 @@ RUN uv sync --frozen
 
 COPY . /code/
 
-CMD ["uv", "run", "src/payroll_calculator/api.py"]
+CMD ["uv", "run", "src/payroll_tax_calculator/api.py"]
