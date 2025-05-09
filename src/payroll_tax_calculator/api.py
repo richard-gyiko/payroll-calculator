@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Annotated
 
@@ -16,6 +17,7 @@ from .loader import load_rules
 app = FastAPI(
     title="Tax Calculator API",
     description="API for calculating taxes based on salary and personal conditions",
+    root_path=os.getenv("ROOT_PATH", "/"),
 )
 
 
